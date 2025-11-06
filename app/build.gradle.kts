@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.fitness.tracker"
-    compileSdk = 34
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.fitness.tracker"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
