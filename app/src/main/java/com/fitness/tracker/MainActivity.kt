@@ -71,9 +71,9 @@ fun FitnessTrackerApp(
     val scope = rememberCoroutineScope()
 
     val currentUser by userViewModel.currentUser.collectAsState()
-    val allUsers by userViewModel.allUsers.collectAsState(initialValue = emptyList())
-    val allExercises by exerciseViewModel.allExercises.collectAsState(initialValue = emptyList())
-    val allExercisesGrouped by exerciseViewModel.allExercisesGroupedByBodyPart.collectAsState(initialValue = emptyList())
+    val allUsers by userViewModel.allUsers.collectAsState(initial = emptyList())
+    val allExercises by exerciseViewModel.allExercises.collectAsState(initial = emptyList())
+    val allExercisesGrouped by exerciseViewModel.allExercisesGroupedByBodyPart.collectAsState(initial = emptyList())
     val exerciseCount by exerciseViewModel.exerciseCount.collectAsState()
 
     var isAuthenticated by remember { mutableStateOf(!preferencesManager.authEnabled) }
@@ -245,7 +245,7 @@ fun FitnessTrackerApp(
             val lastThreeLogs by logViewModel.getLastThreeLogsForExercise(
                 currentUser?.id ?: return@composable,
                 exerciseId
-            ).collectAsState(initialValue = emptyList())
+            ).collectAsState(initial = emptyList())
 
             val personalRecordWeight by logViewModel.personalRecordWeight.collectAsState()
 
@@ -291,7 +291,7 @@ fun FitnessTrackerApp(
 
             // Collect all logs grouped by exercise
             val allLogsForUser by logViewModel.getAllLogsWithExerciseForUser(userId)
-                .collectAsState(initialValue = emptyList())
+                .collectAsState(initial = emptyList())
 
             val logsGroupedByExercise = allLogsForUser.groupBy { it.exercise.id }
             val personalRecords = remember(allLogsForUser) {
