@@ -29,6 +29,7 @@ import com.fitness.tracker.ui.viewmodel.UserViewModel
 import com.fitness.tracker.util.CsvHelper
 import com.fitness.tracker.util.EmailHelper
 import com.fitness.tracker.util.PreferencesManager
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -133,7 +134,7 @@ fun FitnessTrackerApp(
                         val logRepository = LogRepository(database.logDao())
                         val logs = mutableListOf<com.fitness.tracker.data.database.entity.LogWithExercise>()
 
-                        logRepository.getAllLogsWithExerciseForUser(user.id).collect { userLogs ->
+                        logRepository.getAllLogsWithExerciseForUser(user.id).first().let { userLogs ->
                             logs.addAll(userLogs)
                         }
 
@@ -341,7 +342,7 @@ fun FitnessTrackerApp(
                         val logRepository = LogRepository(database.logDao())
                         val logs = mutableListOf<com.fitness.tracker.data.database.entity.LogWithExercise>()
 
-                        logRepository.getAllLogsWithExerciseForUser(userId).collect { userLogs ->
+                        logRepository.getAllLogsWithExerciseForUser(userId).first().let { userLogs ->
                             logs.addAll(userLogs)
                         }
 
