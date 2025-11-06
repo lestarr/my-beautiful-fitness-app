@@ -12,7 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -70,11 +70,11 @@ fun FitnessTrackerApp(
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
 
-    val currentUser by userViewModel.currentUser.collectAsStateWithLifecycle()
-    val allUsers by userViewModel.allUsers.collectAsStateWithLifecycle(initialValue = emptyList())
-    val allExercises by exerciseViewModel.allExercises.collectAsStateWithLifecycle(initialValue = emptyList())
-    val allExercisesGrouped by exerciseViewModel.allExercisesGroupedByBodyPart.collectAsStateWithLifecycle(initialValue = emptyList())
-    val exerciseCount by exerciseViewModel.exerciseCount.collectAsStateWithLifecycle()
+    val currentUser by userViewModel.currentUser.collectAsState()
+    val allUsers by userViewModel.allUsers.collectAsState(initialValue = emptyList())
+    val allExercises by exerciseViewModel.allExercises.collectAsState(initialValue = emptyList())
+    val allExercisesGrouped by exerciseViewModel.allExercisesGroupedByBodyPart.collectAsState(initialValue = emptyList())
+    val exerciseCount by exerciseViewModel.exerciseCount.collectAsState()
 
     var isAuthenticated by remember { mutableStateOf(!preferencesManager.authEnabled) }
     var useKg by remember { mutableStateOf(preferencesManager.useKg) }
@@ -245,9 +245,9 @@ fun FitnessTrackerApp(
             val lastThreeLogs by logViewModel.getLastThreeLogsForExercise(
                 currentUser?.id ?: return@composable,
                 exerciseId
-            ).collectAsStateWithLifecycle(initialValue = emptyList())
+            ).collectAsState(initialValue = emptyList())
 
-            val personalRecordWeight by logViewModel.personalRecordWeight.collectAsStateWithLifecycle()
+            val personalRecordWeight by logViewModel.personalRecordWeight.collectAsState()
 
             LaunchedEffect(exerciseId) {
                 logViewModel.loadPersonalRecord(currentUser?.id ?: return@LaunchedEffect, exerciseId)
@@ -291,7 +291,7 @@ fun FitnessTrackerApp(
 
             // Collect all logs grouped by exercise
             val allLogsForUser by logViewModel.getAllLogsWithExerciseForUser(userId)
-                .collectAsStateWithLifecycle(initialValue = emptyList())
+                .collectAsState(initialValue = emptyList())
 
             val logsGroupedByExercise = allLogsForUser.groupBy { it.exercise.id }
             val personalRecords = remember(allLogsForUser) {
