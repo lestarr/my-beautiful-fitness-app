@@ -5,7 +5,8 @@ A lightweight, offline-first Android fitness tracking application built with Kot
 ## Features
 
 ### Exercise Management
-- **Extendable Exercise Database**: Store exercises with name and body part
+- **Pre-filled Exercise Library**: 20 popular exercises included (4 per muscle group: Legs, Chest, Back, Core, Arms)
+- **Muscle Group Dropdown**: Standardized categories for consistent organization
 - **CRUD Operations**: Add, edit, and delete exercises
 - **CSV Import/Export**: Import exercises from CSV files or export your database
 - **Smart Display**:
@@ -26,12 +27,17 @@ A lightweight, offline-first Android fitness tracking application built with Kot
 - **Best Set Tracking**: Focus on tracking your best set per exercise
 
 ### Dashboard & Analytics
-- **Weight Progression**: View weight over time per exercise
+- **Multiple View Modes**: Switch between List, Table, and Chart views
+- **Table View**: Quick overview of last N workouts per exercise, grouped by muscle group
+- **Line Charts**: Weight progression visualization with exercise selection
 - **Personal Records**: Automatic PR tracking with celebration notifications
 - **Exercise History**: Complete log history for each exercise
+- **Statistics**: Min/Max/Avg weight tracking per exercise
 
 ### Additional Features
 - **Unit Toggle**: Switch between kg and lbs
+- **Configurable Table View**: Adjust number of columns (1-10 logs per exercise)
+- **Improved Keyboard UX**: Auto-dismiss keyboard, scrollable forms
 - **Optional PIN Auth**: Secure app with 4-digit PIN (optional)
 - **Data Export**: Export user logs as CSV
 - **Offline-First**: All data stored locally using Room Database
@@ -54,6 +60,50 @@ A lightweight, offline-first Android fitness tracking application built with Kot
 - **Minimum Android Version**: API 24 (Android 7.0)
 - **Target Android Version**: API 34 (Android 14)
 - **JDK**: Java 17
+
+## Installation (APK)
+
+### Download Pre-built APK from GitHub Actions
+
+The easiest way to install the app is to download the pre-built APK from GitHub Actions:
+
+1. **Go to GitHub Actions**
+   - Visit: https://github.com/lestarr/my-beautiful-fitness-app/actions
+   - Click on the latest successful workflow run (look for the green ✓)
+
+2. **Download the APK**
+   - Scroll down to the "Artifacts" section
+   - Click on **app-debug** to download the APK file
+   - The file will be downloaded as a ZIP archive
+
+3. **Extract the ZIP**
+   - Extract the ZIP file on your computer
+   - You'll find `app-debug.apk` inside
+
+4. **Transfer to your Android device**
+   - Connect your phone to your computer via USB, or
+   - Upload the APK to Google Drive/Dropbox and download on your phone, or
+   - Email the APK to yourself and download on your phone
+
+5. **Install on Android**
+
+   **First time installation:**
+   - Open the APK file on your Android device
+   - Android will show a warning: "Install unknown apps"
+   - Tap **Settings** → Enable **Allow from this source**
+   - Go back and tap **Install**
+   - Once installed, tap **Open** to launch the app
+
+   **Security Note**: After installation, you can disable "Install unknown apps" for that source in Settings → Apps → Special app access.
+
+### Alternative: Install via ADB (Android Debug Bridge)
+
+If you have ADB installed on your computer:
+
+```bash
+# Connect your Android device via USB with USB debugging enabled
+adb install app-debug.apk
+```
 
 ## Build Instructions
 

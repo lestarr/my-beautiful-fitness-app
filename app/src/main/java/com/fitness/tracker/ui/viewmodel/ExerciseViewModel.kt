@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.fitness.tracker.data.database.AppDatabase
 import com.fitness.tracker.data.database.entity.Exercise
 import com.fitness.tracker.data.repository.ExerciseRepository
+import com.fitness.tracker.util.PopularExercises
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,11 +24,25 @@ class ExerciseViewModel(application: Application) : AndroidViewModel(application
 
     init {
         loadExerciseCount()
+        preFillPopularExercises()
     }
 
     private fun loadExerciseCount() {
         viewModelScope.launch {
             _exerciseCount.value = exerciseRepository.getExerciseCount()
+        }
+    }
+
+    /**
+     * Pre-fill database with popular exercises if it's empty
+     */
+    private fun preFillPopularExercises() {
+        viewModelScope.launch {
+            val count = exerciseRepository.getExerciseCount()
+            if (count == 0) {
+                exerciseRepository.insertExercises(PopularExercises.getAll())
+                loadExerciseCount()
+            }
         }
     }
 
