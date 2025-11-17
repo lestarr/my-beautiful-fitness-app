@@ -12,6 +12,9 @@ class LogRepository(private val logDao: LogDao) {
     fun getLastThreeLogsForExercise(userId: Long, exerciseId: Long): Flow<List<LogWithExercise>> =
         logDao.getLastThreeLogsForExercise(userId, exerciseId)
 
+    fun getLastNLogsForExercise(userId: Long, exerciseId: Long, limit: Int): Flow<List<LogWithExercise>> =
+        logDao.getLastNLogsForExercise(userId, exerciseId, limit)
+
     fun getAllLogsForExercise(userId: Long, exerciseId: Long): Flow<List<LogWithExercise>> =
         logDao.getAllLogsForExercise(userId, exerciseId)
 

@@ -12,6 +12,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_USE_KG = "use_kg"
         private const val KEY_APP_PIN = "app_pin"
         private const val KEY_AUTH_ENABLED = "auth_enabled"
+        private const val KEY_TABLE_LOG_COUNT = "table_log_count"
     }
 
     var currentUserId: Long
@@ -29,4 +30,8 @@ class PreferencesManager(context: Context) {
     var authEnabled: Boolean
         get() = prefs.getBoolean(KEY_AUTH_ENABLED, false)
         set(value) = prefs.edit().putBoolean(KEY_AUTH_ENABLED, value).apply()
+
+    var tableLogCount: Int
+        get() = prefs.getInt(KEY_TABLE_LOG_COUNT, 3)
+        set(value) = prefs.edit().putInt(KEY_TABLE_LOG_COUNT, value).apply()
 }

@@ -79,6 +79,7 @@ fun FitnessTrackerApp(
 
     var isAuthenticated by remember { mutableStateOf(!preferencesManager.authEnabled) }
     var useKg by remember { mutableStateOf(preferencesManager.useKg) }
+    var tableLogCount by remember { mutableStateOf(preferencesManager.tableLogCount) }
 
     val startDestination = if (preferencesManager.authEnabled && !isAuthenticated) {
         Screen.Auth.route
@@ -306,6 +307,7 @@ fun FitnessTrackerApp(
                 allLogsGrouped = logsGroupedByExercise,
                 personalRecords = personalRecords,
                 useKg = useKg,
+                tableLogCount = tableLogCount,
                 onBack = { navController.popBackStack() },
                 onExerciseClick = { exerciseId ->
                     navController.navigate(Screen.LogEntry.createRoute(exerciseId))
@@ -319,6 +321,7 @@ fun FitnessTrackerApp(
                 currentUser = currentUser,
                 useKg = useKg,
                 authEnabled = preferencesManager.authEnabled,
+                tableLogCount = tableLogCount,
                 onBack = { navController.popBackStack() },
                 onSwitchUser = {
                     navController.navigate(Screen.UserSelection.route)
@@ -334,6 +337,10 @@ fun FitnessTrackerApp(
                     } else {
                         preferencesManager.authEnabled = enabled
                     }
+                },
+                onTableLogCountChange = { count ->
+                    tableLogCount = count
+                    preferencesManager.tableLogCount = count
                 },
                 onExportUserLogs = {
                     scope.launch {

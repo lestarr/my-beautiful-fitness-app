@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.fitness.tracker.data.database.entity.Exercise
+import com.fitness.tracker.util.MuscleGroup
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -170,6 +171,7 @@ fun ExerciseManagementItem(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseDialog(
     title: String,
@@ -179,6 +181,9 @@ fun ExerciseDialog(
 ) {
     var name by remember { mutableStateOf(exercise?.name ?: "") }
     var bodyPart by remember { mutableStateOf(exercise?.bodyPart ?: "") }
+    var expanded by remember { mutableStateOf(false) }
+
+    val muscleGroups = MuscleGroup.getAllSorted()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -189,15 +194,46 @@ fun ExerciseDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Exercise Name") },
-                    singleLine = true
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = bodyPart,
-                    onValueChange = { bodyPart = it },
-                    label = { Text("Body Part") },
-                    singleLine = true
-                )
+
+                // Muscle Group Dropdown
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = bodyPart,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Muscle Group") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        muscleGroups.forEach { group ->
+                            DropdownMenuItem(
+                                text = { Text(group) },
+                                onClick = {
+                                    bodyPart = group
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                            )
+                        }
+                    }
+                }
             }
         },
         confirmButton = {

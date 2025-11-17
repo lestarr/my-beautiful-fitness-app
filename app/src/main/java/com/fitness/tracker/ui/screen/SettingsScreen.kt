@@ -17,10 +17,12 @@ fun SettingsScreen(
     currentUser: User?,
     useKg: Boolean,
     authEnabled: Boolean,
+    tableLogCount: Int,
     onBack: () -> Unit,
     onSwitchUser: () -> Unit,
     onToggleUnit: (Boolean) -> Unit,
     onToggleAuth: (Boolean) -> Unit,
+    onTableLogCountChange: (Int) -> Unit,
     onExportUserLogs: () -> Unit
 ) {
     Scaffold(
@@ -103,6 +105,43 @@ fun SettingsScreen(
                     checked = useKg,
                     onCheckedChange = onToggleUnit
                 )
+            }
+
+            Divider()
+
+            // Table Log Count Slider
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.TableChart, null)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text("Table View Columns", style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            "Show last $tableLogCount logs per exercise",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("1", style = MaterialTheme.typography.bodySmall)
+                    Slider(
+                        value = tableLogCount.toFloat(),
+                        onValueChange = { onTableLogCountChange(it.toInt()) },
+                        valueRange = 1f..10f,
+                        steps = 8,
+                        modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+                    )
+                    Text("10", style = MaterialTheme.typography.bodySmall)
+                }
             }
 
             Divider()

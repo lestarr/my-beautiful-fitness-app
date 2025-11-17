@@ -15,6 +15,10 @@ interface LogDao {
     fun getLastThreeLogsForExercise(userId: Long, exerciseId: Long): Flow<List<LogWithExercise>>
 
     @Transaction
+    @Query("SELECT * FROM logs WHERE userId = :userId AND exerciseId = :exerciseId ORDER BY date DESC LIMIT :limit")
+    fun getLastNLogsForExercise(userId: Long, exerciseId: Long, limit: Int): Flow<List<LogWithExercise>>
+
+    @Transaction
     @Query("SELECT * FROM logs WHERE userId = :userId AND exerciseId = :exerciseId ORDER BY date DESC")
     fun getAllLogsForExercise(userId: Long, exerciseId: Long): Flow<List<LogWithExercise>>
 
