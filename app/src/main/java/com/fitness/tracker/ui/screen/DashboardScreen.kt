@@ -1,5 +1,6 @@
 package com.fitness.tracker.ui.screen
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -13,25 +14,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fitness.tracker.data.database.entity.Exercise
 import com.fitness.tracker.data.database.entity.LogWithExercise
 import com.fitness.tracker.util.UnitConverter
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
-import com.patrykandpatrick.vico.compose.chart.Chart
-import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.compose.component.shapeComponent
-import com.patrykandpatrick.vico.compose.component.textComponent
-import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
-import com.patrykandpatrick.vico.core.axis.AxisPosition
-import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
-import com.patrykandpatrick.vico.core.entry.entryModelOf
-import com.patrykandpatrick.vico.core.entry.entryOf
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 enum class DashboardView {
     LIST, TABLE, CHART
@@ -541,36 +536,50 @@ fun ChartView(
                             )
 
                             // Create chart data
-                            val entries = logs.mapIndexed { index, logWithExercise ->
-                                val weight = if (useKg) logWithExercise.log.weight
+                            val weights = logs.map { logWithExercise ->
+                                if (useKg) logWithExercise.log.weight
                                 else UnitConverter.kgToLbs(logWithExercise.log.weight)
-                                entryOf(index.toFloat(), weight.toFloat())
                             }
 
-                            val model = entryModelOf(entries)
+                            // Simple custom line chart
+                            if (weights.isNotEmpty()) {
+                                SimpleLineChart(
+                                    data = weights,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp)
+                                        .padding(vertical = 8.dp)
+                                )
 
-                            // Simple chart
-                            if (entries.isNotEmpty()) {
-                                ProvideChartStyle {
-                                    Chart(
-                                        chart = lineChart(),
-                                        model = model,
-                                        startAxis = rememberStartAxis(
-                                            title = "Weight (${if (useKg) "kg" else "lbs"})",
-                                            titleComponent = textComponent {
-                                                color = MaterialTheme.colorScheme.onSurface.toArgb()
-                                            }
-                                        ),
-                                        bottomAxis = rememberBottomAxis(
-                                            title = "Session",
-                                            titleComponent = textComponent {
-                                                color = MaterialTheme.colorScheme.onSurface.toArgb()
-                                            }
-                                        ),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(200.dp)
-                                    )
+                                // Show min/max/avg stats
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Min", style = MaterialTheme.typography.labelSmall)
+                                        Text(
+                                            "${String.format("%.1f", weights.minOrNull() ?: 0.0)} ${if (useKg) "kg" else "lbs"}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Avg", style = MaterialTheme.typography.labelSmall)
+                                        Text(
+                                            "${String.format("%.1f", weights.average())} ${if (useKg) "kg" else "lbs"}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Max", style = MaterialTheme.typography.labelSmall)
+                                        Text(
+                                            "${String.format("%.1f", weights.maxOrNull() ?: 0.0)} ${if (useKg) "kg" else "lbs"}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
                                 }
                             }
 
@@ -578,6 +587,86 @@ fun ChartView(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun SimpleLineChart(
+    data: List<Double>,
+    modifier: Modifier = Modifier,
+    lineColor: Color = MaterialTheme.colorScheme.primary
+) {
+    if (data.isEmpty()) return
+
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        )
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            val width = size.width
+            val height = size.height
+            val padding = 20f
+
+            val maxValue = data.maxOrNull() ?: 1.0
+            val minValue = data.minOrNull() ?: 0.0
+            val range = maxValue - minValue
+            val valueRange = if (range == 0.0) 1.0 else range
+
+            // Calculate points
+            val points = data.mapIndexed { index, value ->
+                val x = padding + (width - 2 * padding) * index / (data.size - 1).coerceAtLeast(1)
+                val normalizedValue = ((value - minValue) / valueRange)
+                val y = height - padding - (height - 2 * padding) * normalizedValue.toFloat()
+                Offset(x, y)
+            }
+
+            // Draw grid lines (horizontal)
+            val gridLineColor = lineColor.copy(alpha = 0.2f)
+            for (i in 0..4) {
+                val y = padding + (height - 2 * padding) * i / 4
+                drawLine(
+                    color = gridLineColor,
+                    start = Offset(padding, y),
+                    end = Offset(width - padding, y),
+                    strokeWidth = 1f
+                )
+            }
+
+            // Draw line chart
+            val path = Path()
+            if (points.isNotEmpty()) {
+                path.moveTo(points.first().x, points.first().y)
+                for (i in 1 until points.size) {
+                    path.lineTo(points[i].x, points[i].y)
+                }
+            }
+
+            drawPath(
+                path = path,
+                color = lineColor,
+                style = Stroke(width = 3f)
+            )
+
+            // Draw points
+            points.forEach { point ->
+                drawCircle(
+                    color = lineColor,
+                    radius = 6f,
+                    center = point
+                )
+                drawCircle(
+                    color = Color.White,
+                    radius = 3f,
+                    center = point
+                )
             }
         }
     }
