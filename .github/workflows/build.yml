@@ -2,7 +2,12 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ claude/fitness-tracking-app-011CUpoo8MYG4Z1XktP5Y3Ga ]
+    branches:
+      - 'claude/**'
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
